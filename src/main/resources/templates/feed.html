@@ -70,11 +70,13 @@
 </header>
 
 <main>
+    <button class="btn-add" onclick="toggleForm()">Добавить пользователя</button>
+
     <section class="filters">
         <h2>Фильтрация по тегам</h2>
         <ul class="tag-list">
             <li th:each="tag : ${tags}">
-                <a th:href="@{/posts(tag=${tag})}" th:text="${tag}"></a>
+                <a th:href="@{/feed(tag=${tag})}" th:text="${tag}"></a>
             </li>
         </ul>
     </section>
@@ -91,7 +93,7 @@
                     <span th:text="'Лайки: ' + ${post.likesCount}"></span>
                     <span>Теги:
                             <span th:each="tag : ${post.tags}">
-                                <a th:href="@{/posts(tag=${tag})}" th:text="${tag}"></a><span
+                                <a th:href="@{/feed(tag=${tag})}" th:text="${tag}"></a><span
                                     th:if="${not (tag == post.tags.last())}">, </span>
                             </span>
                         </span>
@@ -99,53 +101,53 @@
             </article>
         </div>
 
-        <!-- Кнопка добавления поста -->
-        <button onclick="togglePostForm()">Добавить пост</button>
-
-        <!-- Форма добавления поста -->
-        <div id="postForm" style="display:none;">
-            <h2>Добавить новый пост</h2>
-            <form action="#" method="POST" enctype="multipart/form-data" th:action="@{/post}" th:object="${newPost}">
-                <label for="title">Название поста:</label>
-                <input type="text" id="title" name="title" required th:field="*{title}" />
-
-                <label for="image">Картинка:</label>
-                <input type="file" id="image" name="image" accept="image/*" required th:field="*{image}" />
-
-                <label for="content">Текст поста:</label>
-                <textarea id="content" name="content" rows="5" required th:field="*{text}"></textarea>
-                <label for="tags">Теги (через запятую):</label>
-                <input type="text" id="tags" name="tags" placeholder="тег1, тег2, тег3" th:field="*{tags}" />
-
-                <button type="submit">Сохранить пост</button>
-            </form>
-        </div>
-
         <!-- Пагинация -->
         <div class="pagination">
                 <span th:if="${currentPage > 1}">
-                    <a th:href="@{/posts(page=${currentPage - 1}, size=${pageSize})}">Назад</a>
+                    <a th:href="@{/feed(page=${currentPage - 1}, size=${pageSize})}">Назад</a>
                 </span>
 
             <span th:each="page : ${pages}">
-                    <a th:href="@{/posts(page=${page}, size=${pageSize})}" th:text="${page}"></a>
+                    <a th:href="@{/feed(page=${page}, size=${pageSize})}" th:text="${page}"></a>
                 </span>
 
             <span th:if="${currentPage < totalPages}">
-                    <a th:href="@{/posts(page=${currentPage + 1}, size=${pageSize})}">Вперед</a>
+                    <a th:href="@{/feed(page=${currentPage + 1}, size=${pageSize})}">Вперед</a>
                 </span>
 
             <span th:text="'Показано ' + ${posts.size()} + ' из ' + ${totalPages} + ' постов'"></span>
         </div>
     </section>
-</main>
 
-<script>
-    function togglePostForm() {
-        const form = document.getElementById('postForm');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-</script>
+
+    <!-- Скрываемая форма для добавления нового пользователя -->
+    <div class="form-container" style="display: none;" id="postForm">
+        <h2>Добавить пост</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="title">Название поста:</label>
+            <input type="text" id="title" name="title" required/>
+
+            <label for="image">Картинка:</label>
+            <input type="file" id="image" name="image" accept="image/*" required />
+
+            <label for="content">Текст поста:</label>
+            <textarea id="content" name="content" rows="5" required ></textarea>
+
+            <label for="tags">Теги (через запятую):</label>
+            <input type="text" id="tags" name="tags" placeholder="тег1, тег2, тег3"/>
+
+            <button type="submit">Сохранить пост</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('postForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+
+</main>
 
 </body>
 </html>

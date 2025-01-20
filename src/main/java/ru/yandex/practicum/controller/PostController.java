@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.yandex.practicum.dto.PostDto;
 import ru.yandex.practicum.model.PostModel;
 import ru.yandex.practicum.service.PostService;
 import ru.yandex.practicum.service.TagService;
@@ -25,7 +26,11 @@ public class PostController {
     private final TagService tagService;
 
     @GetMapping("/feed")
-    public String feed(Model model, @RequestParam(required = false) String tag, @PageableDefault Pageable pageable) {
+    public String feed(
+            Model model,
+            @RequestParam(required = false, name = "tag") String tag,
+            @PageableDefault Pageable pageable
+    ) {
         List<String> tags = tagService.getAllTags();
         Page<PostModel> posts = postService.findByTag(tag, pageable);
         model.addAttribute("tags", tags);
@@ -36,8 +41,9 @@ public class PostController {
     }
 
     @PostMapping("/post")
-    public String save(@ModelAttribute PostModel postModel) {
-        postService.save(postModel);
+    public String save(@ModelAttribute PostDto post) {
+//        postService.save(post);
+        List<String> tags = tagService.getAllTags();
         return "redirect:/feed";
     }
 }
