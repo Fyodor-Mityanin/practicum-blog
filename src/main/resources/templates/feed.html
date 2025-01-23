@@ -8,62 +8,7 @@
     <title>Посты</title>
 
     <!-- Стили страницы -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        .actions {
-            text-align: center;
-        }
-
-        .form-container {
-            margin-top: 20px;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-
-        input[type="text"], input[type="number"], input[type="checkbox"] {
-            width: 100%;
-            padding: 5px;
-            margin-top: 5px;
-        }
-
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="css/style.css"></head>
 <body>
 <header>
     <h1>Мой Блог</h1>
@@ -85,16 +30,15 @@
         <h2>Посты</h2>
         <div th:each="post : ${posts}">
             <article class="post">
-                <h3><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></h3>
-                <img th:src="${post.image}" alt="Картинка поста" class="post-image">
-                <p th:text="${post.content.substring(0, 100) + '...'}"></p>
+                <h3><a th:href="@{/blog/post/{id}(id=${post.id})}" th:text="${post.title}"></a></h3>
+                <img th:src="@{'data:image/png;base64,'+${post.image}}" alt="Картинка поста" class="post-image">
+                <p th:text="${post.content.length() < 100 ? post.content : post.content.substring(0, 100) + '...'}"></p>
                 <div class="post-meta">
-                    <span th:text="'Комментарии: ' + ${post.commentsCount}"></span>
-                    <span th:text="'Лайки: ' + ${post.likesCount}"></span>
+                    <span th:text="'Комментарии: ' + ${post.comments.size()}"></span>
+                    <span th:text="'Лайки: ' + ${post.likes.size()}"></span>
                     <span>Теги:
                             <span th:each="tag : ${post.tags}">
-                                <a th:href="@{/feed(tag=${tag})}" th:text="${tag}"></a><span
-                                    th:if="${not (tag == post.tags.last())}">, </span>
+                                <a th:href="@{/blog(tag=${tag.name})}" th:text="${tag.name}"></a><span> </span>
                             </span>
                         </span>
                 </div>
@@ -104,18 +48,18 @@
         <!-- Пагинация -->
         <div class="pagination">
                 <span th:if="${currentPage > 1}">
-                    <a th:href="@{/feed(page=${currentPage - 1}, size=${pageSize})}">Назад</a>
+                    <a th:href="@{/blog(page=${currentPage - 1}, size=${pageSize})}">Назад</a>
                 </span>
 
             <span th:each="page : ${pages}">
-                    <a th:href="@{/feed(page=${page}, size=${pageSize})}" th:text="${page}"></a>
-                </span>
+                    <a th:href="@{/blog(page=${page}, size=${pageSize})}" th:text="${page}"></a>
+            </span>
 
             <span th:if="${currentPage < totalPages}">
-                    <a th:href="@{/feed(page=${currentPage + 1}, size=${pageSize})}">Вперед</a>
+                    <a th:href="@{/blog(page=${currentPage + 1}, size=${pageSize})}">Вперед</a>
                 </span>
 
-            <span th:text="'Показано ' + ${posts.size()} + ' из ' + ${totalPages} + ' постов'"></span>
+            <span th:text="'Показано ' + ${posts.size()} + ' из ' + ${posts.size()} + ' постов'"></span>
         </div>
     </section>
 
@@ -123,7 +67,7 @@
     <!-- Скрываемая форма для добавления нового пользователя -->
     <div class="form-container" style="display: none;" id="postForm">
         <h2>Добавить пост</h2>
-        <form method="POST" enctype="multipart/form-data">
+        <form id="postFormElement" method="POST" enctype="multipart/form-data">
             <label for="title">Название поста:</label>
             <input type="text" id="title" name="title" required/>
 
@@ -145,6 +89,26 @@
             const form = document.getElementById('postForm');
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
+
+        document.getElementById('postFormElement').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const currentUrl = window.location.href;
+            const postUrl = currentUrl + '/post';
+            fetch(postUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
     </script>
 
 </main>

@@ -13,7 +13,7 @@ public class PostModel {
     private Long id;
     private String title;
     private String content;
-    private byte[] image;
+    private String image;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Set<CommentModel> comments = new LinkedHashSet<>();

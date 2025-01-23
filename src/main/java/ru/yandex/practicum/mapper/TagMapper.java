@@ -9,5 +9,6 @@ import java.util.List;
 @Mapper
 public interface TagMapper {
     TagModel toModel(Tag source);
-    List<TagModel> toModel(List<Tag> source);
+
+    List<TagModel> toModels(List<Tag> source);
 }
