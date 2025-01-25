@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.dto.CommentDto;
@@ -84,9 +83,19 @@ public class PostController {
         return "redirect:/blog";
     }
 
-    @PostMapping(path = "/post/{id}/comment", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public String addComment(@PathVariable("id") Long id, @RequestBody CommentDto dto) {
-        postService.addComment(id, dto);
+    @PostMapping(path = "/post/{id}/comment")
+    public String addComment(@PathVariable("id") Long id, @ModelAttribute CommentDto comment) {
+        postService.addComment(id, comment);
         return "redirect:/blog/post/" + id;
+    }
+
+    @DeleteMapping(path = "/post/{id}/comment/{commentId}")
+    public void deleteComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId) {
+        postService.deleteComment(id, commentId);
+    }
+
+    @GetMapping(path = "/post/{id}/like}")
+    public void likePost(@PathVariable("id") Long id) {
+        postService.like(id);
     }
 }

@@ -18,6 +18,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagService tagService;
     private final CommentService commentService;
+    private final LikeService likeService;
     private final PostMapper postMapper;
 
     @Transactional
@@ -57,5 +58,16 @@ public class PostService {
     public void addComment(Long id, CommentDto dto) {
         Post post = postRepository.getReferenceById(id);
         commentService.save(post, dto);
+    }
+
+    public void deleteComment(Long id, Long commentId) {
+        postRepository.getReferenceById(id).getComments().stream()
+                .filter(it -> it.getId().equals(commentId))
+                .findFirst()
+                .ifPresent(commentService::remove);
+    }
+
+    public void like(Long id) {
+        likeService.likePost(postRepository.getReferenceById(id));
     }
 }

@@ -33,14 +33,10 @@
         </div>
     </div>
 
-    <div class="form-container" id="commentForm">
-        <h2>Добавить комментарий</h2>
-        <form id="commentFormElement" method="POST" enctype="application/x-www-form-urlencoded">
-            <label for="text">Текст комментария:</label>
-            <input type="text" id="text" name="text" required/>
-            <button type="submit">Отправить</button>
-        </form>
-    </div>
+    <form action="#" th:action="@{/comment}" th:object="${comment}" method="post">
+        <p>Комментарий: <input type="text" th:field="*{text}" /></p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
 </div>
 
 <script>
@@ -64,27 +60,32 @@
         window.location.href = currentUrl + '/edit'
     }
 
-    document.getElementById('commentFormElement').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-        const currentUrl = window.location.href;
-        const postUrl = currentUrl + '/comment';
-        fetch(postUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    });
+    // document.getElementById('commentFormElement').addEventListener('submit', function(event) {
+    //     event.preventDefault();
+    //     const formData = new FormData(this);
+    //     const currentUrl = window.location.href;
+    //     const postUrl = currentUrl + '/comment';
+    //     fetch(postUrl, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //         body: formData
+    //     })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok ' + response.statusText);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             console.log('Комментарий успешно добавлен:', data);
+    //             window.location.reload();
+    //         })
+    //         .catch(error => {
+    //             console.error('Ошибка при добавлении комментария:', error);
+    //         });
+    // });
 
     function likePost(postId) {
         fetch(`/api/posts/${postId}/like`, {
