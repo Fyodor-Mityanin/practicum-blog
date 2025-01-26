@@ -15,6 +15,7 @@ import ru.yandex.practicum.blog.repository.PostRepository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -102,7 +103,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public void save(Post post) {
+    public void saveWithTags(Post post) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
@@ -114,7 +115,7 @@ public class PostRepositoryImpl implements PostRepository {
                 },
                 keyHolder
         );
-        long postId = (long) keyHolder.getKeys().get("id");
+        long postId = (long) Objects.requireNonNull(keyHolder.getKeys()).get("id");
         jdbcTemplate.batchUpdate(
                 POST_TAG_SAVE_QUERY,
                 post.getTags(),
@@ -138,7 +139,8 @@ public class PostRepositoryImpl implements PostRepository {
                                 rs.getBytes("image"),
                                 rs.getTimestamp("created_at").toLocalDateTime(),
                                 rs.getTimestamp("updated_at").toLocalDateTime()
-                        )
+                        ),
+                id
         );
     }
 

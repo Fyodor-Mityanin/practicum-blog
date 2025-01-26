@@ -51,15 +51,19 @@ class PostControllerIntegrationTest {
     }
 
     @Test
+    @Sql({
+            "sql/posts.sql",
+            "sql/tags.sql"
+    })
     void savePost_shouldSavePost() throws Exception {
         mockMvc.perform(post("/blog/post")
                         .param("title", "title")
                         .param("content", "content")
                         .param("tags", "tag1,tag2,tag3")
-                        .content(new byte[] {1, 2, 3})
+                        .content(new byte[]{1, 2, 3})
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -77,25 +81,28 @@ class PostControllerIntegrationTest {
     @Sql("sql/posts.sql")
     void deletePost_shouldDeletePost() throws Exception {
         mockMvc.perform(delete("/blog/post/2"))
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
+    @Sql({"sql/posts.sql", "sql/tags.sql"})
     void updatePost_shouldUpdatePost() throws Exception {
-        mockMvc.perform(put("/blog/post/2")
+        mockMvc.perform(put("/blog/post/2/edit")
                         .param("title", "newTitle")
                         .param("content", "newcontent")
-                        .param("tags", "tag1,tag3")
+                        .param("tags", "tag11,tag33")
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
+    @Sql("sql/posts.sql")
     void addComment_shouldAddComment() throws Exception {
         mockMvc.perform(post("/blog/post/2/comment")
                         .param("text", "texteext")
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test

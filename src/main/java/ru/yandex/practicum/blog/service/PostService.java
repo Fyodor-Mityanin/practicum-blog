@@ -7,14 +7,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.blog.domain.Comment;
 import ru.yandex.practicum.blog.domain.Like;
 import ru.yandex.practicum.blog.domain.Post;
-import ru.yandex.practicum.blog.domain.PostTag;
 import ru.yandex.practicum.blog.domain.Tag;
 import ru.yandex.practicum.blog.dto.request.CommentRequestDto;
 import ru.yandex.practicum.blog.dto.request.PostRequestDto;
 import ru.yandex.practicum.blog.dto.response.PostDto;
 import ru.yandex.practicum.blog.mapper.PostMapper;
 import ru.yandex.practicum.blog.repository.PostRepository;
-import ru.yandex.practicum.blog.repository.PostTagRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +22,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final PostTagRepository postTagRepository;
     private final TagService tagService;
     private final CommentService commentService;
     private final LikeService likeService;
@@ -52,10 +49,7 @@ public class PostService {
     public void save(PostRequestDto dto) {
         Post entity = postMapper.toEntity(dto);
         entity.setTags(tagService.save(dto.getTags()));
-        postRepository.save(entity);
-        entity.getTags().stream()
-                .map(tag -> new PostTag(entity.getId(), tag.getId()))
-                .forEach(postTagRepository::save);
+        postRepository.saveWithTags(entity);
     }
 
     public PostDto getById(Long id) {

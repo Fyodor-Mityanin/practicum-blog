@@ -76,7 +76,7 @@ public class PostController {
     }
 
     @PutMapping(path = "/post/{id}/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String update(@ModelAttribute PostRequestDto postDto, @PathVariable Long id) {
+    public String update(@ModelAttribute PostRequestDto postDto, @PathVariable("id") Long id) {
         postService.update(id, postDto);
         return "redirect:/blog";
     }

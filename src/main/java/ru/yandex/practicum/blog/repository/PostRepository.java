@@ -9,7 +9,7 @@ import ru.yandex.practicum.blog.domain.Post;
 public interface PostRepository {
     Page<Post> findByTagsNameIgnoreCase(String name, Pageable pageable);
     Page<Post> findAll(Pageable pageable);
-    void save(Post entity);
+    void saveWithTags(Post entity);
     Post getReferenceById(Long id);
     void deleteById(Long id);
     void update(Post entity);

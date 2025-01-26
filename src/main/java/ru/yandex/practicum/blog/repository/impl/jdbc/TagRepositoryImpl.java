@@ -2,15 +2,19 @@ package ru.yandex.practicum.blog.repository.impl.jdbc;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.blog.domain.Tag;
 import ru.yandex.practicum.blog.repository.TagRepository;
 
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,7 +24,7 @@ public class TagRepositoryImpl implements TagRepository {
     public static final String FIND_BY_NAME_QUERY = """
             SELECT t.*
             FROM tags t
-            WHERE LOWER(t.name) = LOWER(?)
+            WHERE LOWER(t.name) IN (%s)
             """;
     public static final String FIND_BY_POST_QUERY = """
             SELECT t.*, pt.post_id as post_id
@@ -33,24 +37,33 @@ public class TagRepositoryImpl implements TagRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Tag> findByNameInIgnoreCase(Collection<String> names) {
+        String inSql = String.join(",", Collections.nCopies(names.size(), "?"));
         return jdbcTemplate.query(
-                FIND_BY_NAME_QUERY,
+                String.format(FIND_BY_NAME_QUERY, inSql),
                 (rs, rowNum) -> new Tag(
                         rs.getLong("id"),
                         rs.getString("name")
                 ),
-                names
+                names.toArray()
         );
     }
 
     @Override
-    public void save(List<Tag> tags) {
-        jdbcTemplate.batchUpdate(
-                SAVE_QUERY,
-                tags,
-                100,
-                (PreparedStatement ps, Tag tag) -> ps.setString(1, tag.getName())
-        );
+    public List<Tag> save(List<Tag> tags) {
+        for (Tag tag : tags) {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(
+                    connection -> {
+                        PreparedStatement ps = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
+                        ps.setString(1, tag.getName());
+                        return ps;
+                    },
+                    keyHolder
+            );
+            long tagId = (long) Objects.requireNonNull(keyHolder.getKeys()).get("id");
+            tag.setId(tagId);
+        }
+        return tags;
     }
 
 

@@ -10,7 +10,7 @@ import java.util.Set;
 @Repository
 public interface TagRepository {
     List<Tag> findByNameInIgnoreCase(Collection<String> names);
-    void save(List<Tag> tags);
+    List<Tag> save(List<Tag> tags);
     List<Tag> getOrCreate(Set<String> tagNames);
     List<Tag> findAll();
     List<Tag> getTagsByPostIds(List<Long> postIds);
