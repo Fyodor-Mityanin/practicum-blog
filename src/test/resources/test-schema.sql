@@ -6,7 +6,7 @@ create table if not exists posts
     image      bytea,
     created_at timestamp default CURRENT_TIMESTAMP,
     updated_at timestamp default CURRENT_TIMESTAMP
-);
+    );
 
 create index idx_post_created_at on posts (created_at);
 
